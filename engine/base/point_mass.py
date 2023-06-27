@@ -6,15 +6,15 @@ class PointMass:
     v: Velocity (vector)
     a: Acceleration (vector)
     m: Mass (scalar)
-    g: Gravity toggle (boolean)
+    g: Gravity (scalar)
     """
     def __init__(self, p, v, a, m, g):
         self.p = p
         self.v = v
         self.a = a
         self.m = m
-        if g == True:
-            self.a[1] = 2
+        self.g = g
+        self.a[1] = g
 
     def getP(self):
         return (self.p[0], self.p[1])

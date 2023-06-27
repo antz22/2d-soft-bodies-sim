@@ -3,8 +3,7 @@ import numpy as np
 import pygame
 
 class Run:
-    def __init__(self, gravity_toggle, full_screen):
-        self.gravity_toggle = gravity_toggle
+    def __init__(self, full_screen):
         self.full_screen = full_screen
         self.pts = []
 
@@ -16,10 +15,15 @@ class Run:
         else:
             self.screen = pygame.display.set_mode([1200, 700])
 
+    def to_pygame(self, x):
+        """Convert coordinates into pygame coordinates (lower-left => top left)."""
+        height = self.screen.get_height()
+        return (x[0], height - x[1])
+
     def draw_pt(self, x):
         blue = (0, 0, 255)
         radius = 5
-        position = (x.p[0], x.p[1])
+        position = self.to_pygame([x.p[0], x.p[1]])
         pygame.draw.circle(self.screen, blue, position, radius)
 
     def draw_pts(self):
@@ -27,16 +31,14 @@ class Run:
             self.draw_pt(x)
 
     def initialize_pts(self):
-        x = PointMass(np.array([200, 200]), np.array([2, 0]), np.array([0, 0]), np.array([0, 0]), self.gravity_toggle)
+        x = PointMass(np.array([200, 600]), np.array([20, 0]), np.array([0, 0]), 1, -6)
         self.pts.append(x)
 
     def update_frame(self):
         for pt in self.pts:
             self.draw_pt(self.pts[0])
-            dt = 1
+            dt = 0.2
             pt.step(dt)
-        # for x in self.pts:
-        #     self.draw_pt(x)
 
     def run(self):
 
