@@ -1,4 +1,3 @@
-import PointMass
 import numpy as np
 class Spring:
     """
@@ -14,14 +13,16 @@ class Spring:
         self.k = k
         self.d = d
     
-    def stepSpring(self):
-        v = self.A - self.B
-        x, y = v
-        norm = np.linalg.norm(v)
-        if norm != 0: 
-            x, y = v * (norm - self.L) * self.k / norm, v * (self.L - norm) * self.k / norm
-        self.A.applyForce(x)
-        self.B.applyForce(y)
-        
+    def calcForces(self):
+        # Calculate spring force
+        x = (self.B.p - self.A.p) - self.L
+        Fs = self.k * x
+        self.A.applyForce(Fs)
+        self.B.applyForce(-Fs)
 
-    
+        # Calculate damping force
+        dir = (self.B.p - self.A.p) / np.linalg.norm(self.B.p - self.A.p)
+        v = self.B.v - self.A.v
+        Fd = np.dot(dir, v) * self.d
+        self.A.applyForce(Fd)
+        self.B.applyForce(-Fd)

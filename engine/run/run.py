@@ -1,11 +1,12 @@
 from engine.base.point_mass import PointMass
+from engine.bodies.solid import Solid
 import numpy as np
 import pygame
 
 class Run:
     def __init__(self, full_screen):
         self.full_screen = full_screen
-        self.pts = []
+        self.solids = []
 
         pygame.init()
 
@@ -20,37 +21,55 @@ class Run:
         height = self.screen.get_height()
         return (x[0], height - x[1])
 
-    def draw_pt(self, x):
+    def draw_pt(self, pt):
         blue = (0, 0, 255)
         radius = 5
-        position = self.to_pygame([x.p[0], x.p[1]])
+        position = self.to_pygame([pt.p[0], pt.p[1]])
         pygame.draw.circle(self.screen, blue, position, radius)
 
-    def draw_pts(self):
-        for x in self.pts:
-            self.draw_pt(x)
+    def draw_spring(self, spring):
+        red = (255, 0, 0)
+        A = self.to_pygame(spring.A.p)
+        B = self.to_pygame(spring.B.p)
+        pygame.draw.line(self.screen, red, A, B)
 
-    def initialize_pts(self):
+    def initialize_solids(self):
 
-        p = np.array([[200.0, 600.0]])
-        v = np.array([[20.0, 0.0]])
-        a = np.array([[0.0, 0.0]])
-        m = [1]
-        g = [-5]
+        p = np.array([200.0, 600.0])
+        v = np.array([0.0, 0.0])
+        a = np.array([0.0, 0.0])
+        m = 1
+        g = -6
 
-        for i in range(len(p)):
-            self.pts.append(PointMass(p[i], v[i], a[i], m[i], g[i]))
+        step = 50.0
+
+        m = 5
+        n = 7
+
+        pts = []
+
+        for i in range(m):
+            pts.append([])
+            for j in range(n):
+                pts[i].append(PointMass(p + np.array([i*step, j*step]), v, a, m, g))
+
+        s = Solid(m=m, n=n, pts=pts)
+        self.solids.append(s)
 
     def update_frame(self):
         dt = 0.05
-        for pt in self.pts:
-            self.draw_pt(pt)
-            pt.step(dt)
+        for solid in self.solids:
+            for spring in solid.springs:
+                self.draw_spring(spring)
+            for row in solid.pts:
+                for pt in row:
+                    self.draw_pt(pt)
+                    pt.step(dt)
 
 
     def run(self):
 
-        self.initialize_pts()
+        self.initialize_solids()
 
         # Run until the user asks to quit
         running = True
