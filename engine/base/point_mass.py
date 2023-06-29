@@ -34,7 +34,7 @@ class PointMass:
         self.v[1] += self.a[1]*dt
         if self.p[1] <= 0:
             self.p[1] = 0
-            self.a[1] = 0
+            self.v[1] *= -1
 
 
 

@@ -1,5 +1,6 @@
 from engine.base.point_mass import PointMass
 from engine.bodies.solid import Solid
+from engine.bodies.polygon import Polygon
 import numpy as np
 import pygame
 
@@ -7,6 +8,8 @@ class Run:
     def __init__(self, full_screen):
         self.full_screen = full_screen
         self.solids = []
+        self.polygons = []
+        self.pts = []
 
         pygame.init()
 
@@ -27,24 +30,58 @@ class Run:
         position = self.to_pygame([pt.p[0], pt.p[1]])
         pygame.draw.circle(self.screen, blue, position, radius)
 
+    def draw_polygon(self, polygon):
+        blue = (0, 0, 255)
+
+        for i in range(len(polygon.pts)-1):
+            A = polygon.pts[i]
+            B = polygon.pts[i+1]
+            pygame.draw.line(self.screen, blue, A, B)
+        pygame.draw.line(self.screen, blue, polygon.pts[len(polygon.pts)-1], polygon.pts[0])
+            
     def draw_spring(self, spring):
         red = (255, 0, 0)
         A = self.to_pygame(spring.A.p)
         B = self.to_pygame(spring.B.p)
         pygame.draw.line(self.screen, red, A, B)
 
-    def initialize_solids(self):
+    def init_pts(self):
 
-        p = np.array([200.0, 600.0])
+        p = np.array([200.0, 100.0])
         v = np.array([0.0, 0.0])
         a = np.array([0.0, 0.0])
         m = 1
         g = -6
 
-        step = 50.0
+        pts = [
+            PointMass(p=p, v=v, a=a, m=m, g=g)
+        ]
 
-        m = 5
-        n = 7
+        self.pts = pts
+
+    def init_polygons(self):
+
+        pts = np.array([
+            [100.0, 20.0],
+            [110.0, 40.0],
+            [140.0, 60.0],
+            [180.0, 70.0],
+        ])
+
+        self.polygons.append(Polygon(pts=pts))
+        
+    def init_solids(self):
+
+        p = np.array([400.0, 600.0])
+        v = np.array([0.0, 0.0])
+        a = np.array([0.0, 0.0])
+        m = 1
+        g = -6
+
+        step = 30.0
+
+        m = 8
+        n = 8
 
         pts = []
 
@@ -66,10 +103,20 @@ class Run:
                     self.draw_pt(pt)
                     pt.step(dt)
 
+        for polygon in self.polygons:
+            self.draw_polygon(polygon)
+
+        for pt in self.pts:
+            self.draw_pt(pt)
+            pt.step(dt)
+        
+
 
     def run(self):
 
-        self.initialize_solids()
+        self.init_solids()
+        self.init_polygons()
+        self.init_pts()
 
         # Run until the user asks to quit
         running = True
