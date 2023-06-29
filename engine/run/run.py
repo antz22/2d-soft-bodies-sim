@@ -31,14 +31,22 @@ class Run:
             self.draw_pt(x)
 
     def initialize_pts(self):
-        x = PointMass(np.array([200, 600]), np.array([20, 0]), np.array([0, 0]), 1, -6)
-        self.pts.append(x)
+
+        p = np.array([[200.0, 600.0]])
+        v = np.array([[20.0, 0.0]])
+        a = np.array([[0.0, 0.0]])
+        m = [1]
+        g = [-5]
+
+        for i in range(len(p)):
+            self.pts.append(PointMass(p[i], v[i], a[i], m[i], g[i]))
 
     def update_frame(self):
+        dt = 0.05
         for pt in self.pts:
-            self.draw_pt(self.pts[0])
-            dt = 0.2
+            self.draw_pt(pt)
             pt.step(dt)
+
 
     def run(self):
 
@@ -57,7 +65,6 @@ class Run:
             self.screen.fill((255, 255, 255))
 
             self.update_frame()
-            # pygame.time.delay(200)
             pygame.time.Clock().tick(60)
 
             # Update the display

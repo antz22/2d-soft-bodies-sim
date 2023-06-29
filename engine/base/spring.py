@@ -1,18 +1,27 @@
-from ..utils.distance import distance
-
+import PointMass
+import numpy as np
 class Spring:
     """
     A, B: Point masses on ends of spring
     L: resting length of spring
-    k_s: stiffness of spring
-    k_d: damping factor of spring
+    k: stiffness of spring
+    d: damping factor of spring
     """
-    def __init__(self, A, B, L, k_s, k_d):
+    def __init__(self, A, B, L, k, d):
         self.A = A
         self.B = B 
         self.L = L
-        self.k_s = k_s
-        self.k_d = k_d
+        self.k = k
+        self.d = d
+    
+    def stepSpring(self):
+        v = self.A - self.B
+        x, y = v
+        norm = np.linalg.norm(v)
+        if norm != 0: 
+            x, y = v * (norm - self.L) * self.k / norm, v * (self.L - norm) * self.k / norm
+        self.A.applyForce(x)
+        self.B.applyForce(y)
+        
 
-    def calc_displacement(self):
-        x = abs(distance(self.A, self.B)) - self.L
+    
