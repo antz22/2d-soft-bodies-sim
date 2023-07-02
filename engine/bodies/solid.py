@@ -12,8 +12,8 @@ class Solid:
 
         springs = []
         L = 50.0
-        k = 1
-        d = 1
+        k = 0.1
+        d = 0.2
 
         for i in range(m):
 

@@ -1,3 +1,5 @@
+import numpy as np
+
 class PointMass:
     """
     Class to model a point mass in the simulation.
@@ -14,30 +16,30 @@ class PointMass:
         self.a = a
         self.m = m
         self.g = g
-        self.a[1] = g
+        self.forces = {"g": np.array([0.0, g])}
 
-    def getP(self):
-        return (self.p[0], self.p[1])
+    def resetA(self):
+        # self.a[0] = 0.0
+        # self.a[1] = self.g
+        pass
 
-    def updateP(self, dp):
-        self.p[0] += dp[0]
-        self.p[1] += dp[1]
+    def applyForces(self):
+        self.a = np.array([0.0, 0.0])
+        for F in self.forces:
+            self.a += self.forces[F] / self.m
 
-    def applyF(self, F):
-        self.a[0] += F[0]/self.m
-        self.a[1] += F[1]/self.m
+    # def reflectV(self, v):
+        # if np.linalg.norm(v) != 0:
+        #     v *= 0.995 / np.linalg.norm(v)
+        # self.v -= 2 * np.dot(self.v, v) * v
 
     def step(self, dt):
+        self.applyForces()
         self.p[0] += self.v[0]*dt
         self.p[1] += self.v[1]*dt
         self.v[0] += self.a[0]*dt
         self.v[1] += self.a[1]*dt
-        if self.p[1] <= 0:
-            self.p[1] = 0
-            self.v[1] *= -1
-
-
-
-    
-    
-        
+        if self.p[1] <= 0.0:
+            self.p[1] = 0.0
+            self.v[1] *= -0.85
+            # self.reflectV(np.array([0, 1.0]))

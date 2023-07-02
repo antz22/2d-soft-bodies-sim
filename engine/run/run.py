@@ -50,8 +50,8 @@ class Run:
         p = np.array([200.0, 100.0])
         v = np.array([0.0, 0.0])
         a = np.array([0.0, 0.0])
-        m = 1
-        g = -6
+        m = 1.0
+        g = -6.0
 
         pts = [
             PointMass(p=p, v=v, a=a, m=m, g=g)
@@ -72,32 +72,35 @@ class Run:
         
     def init_solids(self):
 
-        p = np.array([400.0, 600.0])
+        p = np.array([400.0, 100.0])
         v = np.array([0.0, 0.0])
         a = np.array([0.0, 0.0])
-        m = 1
-        g = -6
+        mass = 1.0
+        g = -6.0
 
-        step = 30.0
+        step = 50.0
 
-        m = 8
-        n = 8
+        m = 3
+        n = 3
 
         pts = []
 
         for i in range(m):
             pts.append([])
             for j in range(n):
-                pts[i].append(PointMass(p + np.array([i*step, j*step]), v, a, m, g))
+                pts[i].append(PointMass(p + np.array([i*step, j*step]), v, a, mass, g))
 
         s = Solid(m=m, n=n, pts=pts)
         self.solids.append(s)
 
     def update_frame(self):
-        dt = 0.05
+        dt = 0.20
         for solid in self.solids:
+
             for spring in solid.springs:
                 self.draw_spring(spring)
+                spring.calcForces()
+
             for row in solid.pts:
                 for pt in row:
                     self.draw_pt(pt)
